@@ -376,8 +376,10 @@ def _get_cart_quotation(party=None):
     """Return the open Quotation of type "Shopping Cart" or make a new one"""
     if not party:
         party = get_party()
+        
+    frappe.log_error(f"party name {frappe.session.user}", party.name)
 
-    quotation = frappe.get_all(
+    quotation = frappe.db.get_all(
         "Quotation",
         fields=["name"],
         filters={
@@ -390,6 +392,7 @@ def _get_cart_quotation(party=None):
         limit_page_length=1,
     )
     
+    frappe.log_error("quotation", str(quotation))
     
     if quotation:
         qdoc = frappe.get_doc("Quotation", quotation[0].name)
