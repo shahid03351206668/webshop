@@ -34,12 +34,12 @@ def set_cart_count(quotation=None):
 @frappe.whitelist()
 def get_cart_quotation(doc=None):
     party = get_party()
-
+    
     if not doc:
         quotation = _get_cart_quotation(party)
         doc = quotation
         set_cart_count(quotation)
-
+    
     addresses = get_address_docs(party=party)
 
     if not doc.customer_address and addresses:
@@ -382,14 +382,13 @@ def _get_cart_quotation(party=None):
         fields=["name"],
         filters={
             "party_name": party.name,
-            "contact_email": frappe.session.user,
             "order_type": "Shopping Cart",
             "docstatus": 0,
         },
         order_by="modified desc",
         limit_page_length=1,
     )
-
+    
     if quotation:
         qdoc = frappe.get_doc("Quotation", quotation[0].name)
     else:

@@ -44,28 +44,11 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
     if cart_settings.show_price:
         is_guest = frappe.session.user == "Guest"
         party = get_party()
-        frappe.log_error(str(party.name))
 
         # Show Price if logged in.
         # If not logged in, check if price is hidden for guest.
         today = nowdate()
-        frappe.log_error(
-            "execute query for item price",
-            f"""
-				SELECT
-					ip.price_list_rate,
-					ip.currency,
-					c.symbol as currency_symbol
-				FROM `tabItem Price` ip
-				INNER JOIN `tabCurrency` c 
-					ON c.name = ip.currency
-				WHERE ip.item_code = {frappe.db.escape(item_code)} 
-				AND ip.price_list = {frappe.db.escape(selling_price_list)}  
-				AND (ip.valid_from IS NULL OR ip.valid_from <= {frappe.db.escape(today)})
-				AND (ip.valid_upto IS NULL OR ip.valid_upto >= {frappe.db.escape(today)})
-				AND ip.customer = {frappe.db.escape(party.name)}
-				""",
-        )
+        
         if not is_guest or not cart_settings.hide_price_for_guest:
             item_price = frappe.db.sql(
                 f"""
