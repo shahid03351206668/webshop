@@ -39,15 +39,33 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
     # )
 
     selling_price_list = cart_settings.get("price_list")
-    
+
     price = {}
     if cart_settings.show_price:
         is_guest = frappe.session.user == "Guest"
         party = get_party()
+        frappe.log_error(str(party.name))
 
         # Show Price if logged in.
         # If not logged in, check if price is hidden for guest.
         today = nowdate()
+        frappe.log_error(
+            "execute query for item price",
+            f"""
+				SELECT
+					ip.price_list_rate,
+					ip.currency,
+					c.symbol as currency_symbol
+				FROM `tabItem Price` ip
+				INNER JOIN `tabCurrency` c 
+					ON c.name = ip.currency
+				WHERE ip.item_code = {frappe.db.escape(item_code)} 
+				AND ip.price_list = {frappe.db.escape(selling_price_list)}  
+				AND (ip.valid_from IS NULL OR ip.valid_from <= {frappe.db.escape(today)})
+				AND (ip.valid_upto IS NULL OR ip.valid_upto >= {frappe.db.escape(today)})
+				AND ip.customer = {frappe.db.escape(party.name)}
+				""",
+        )
         if not is_guest or not cart_settings.hide_price_for_guest:
             item_price = frappe.db.sql(
                 f"""
@@ -67,7 +85,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
                 as_dict=True,
                 debug=True,
             )
-            
+
             if item_price:
                 item_price = item_price[0]
                 price = {
@@ -83,6 +101,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
                 }
 
             else:
+
                 price = get_price(
                     item_code,
                     selling_price_list,
@@ -123,9 +142,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
 
     if product_info["price"]:
         if frappe.session.user != "Guest":
-            item = (
-                cart_quotation.get({"item_code": item_code}) if cart_quotation else None
-            )
+            item = cart_quotation.get({"item_code": item_code}) if cart_quotation else None
             if item:
                 product_info["qty"] = item[0].qty
 
@@ -134,9 +151,9 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
 
 def set_product_info_for_website(item):
     """set product price uom for website"""
-    product_info = get_product_info_for_website(
-        item.item_code, skip_quotation_creation=True
-    ).get("product_info")
+    product_info = get_product_info_for_website(item.item_code, skip_quotation_creation=True).get(
+        "product_info"
+    )
 
     if product_info:
         item.update(product_info)
@@ -144,9 +161,7 @@ def set_product_info_for_website(item):
         item["sales_uom"] = product_info.get("sales_uom")
         if product_info.get("price"):
             item["price_stock_uom"] = product_info.get("price").get("formatted_price")
-            item["price_sales_uom"] = product_info.get("price").get(
-                "formatted_price_sales_uom"
-            )
+            item["price_sales_uom"] = product_info.get("price").get("formatted_price_sales_uom")
         else:
             item["price_stock_uom"] = ""
             item["price_sales_uom"] = ""
