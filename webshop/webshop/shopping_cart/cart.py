@@ -385,9 +385,11 @@ def _get_cart_quotation(party=None):
             "order_type": "Shopping Cart",
             "docstatus": 0,
         },
+
         order_by="modified desc",
         limit_page_length=1,
     )
+    
     
     if quotation:
         qdoc = frappe.get_doc("Quotation", quotation[0].name)

@@ -290,7 +290,7 @@ class ProductQuery:
 				fields=["name"],
 				filters={
 					"party_name": customer,
-					"contact_email": frappe.session.user,
+					# "contact_email": frappe.session.user,
 					"order_type": "Shopping Cart",
 					"docstatus": 0,
 				},
