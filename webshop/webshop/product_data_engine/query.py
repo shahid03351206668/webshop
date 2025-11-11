@@ -9,6 +9,14 @@ from webshop.webshop.shopping_cart.product_info import get_product_info_for_webs
 from webshop.webshop.utils.product import get_non_stock_item_status
 
 
+def get_b2b_customer_items():
+	customer = frappe.db.get_value('Portal User', {"user": frappe.session.user}, "parent")
+	if customer:
+		doc = frappe.get_doc("Customer", customer)
+		return [d.item for d in doc.custom_customer_items_b2b]
+	return []
+
+
 class ProductQuery:
 	"""Query engine for product listing
 
@@ -23,9 +31,11 @@ class ProductQuery:
 	def __init__(self):
 		self.settings = frappe.get_doc("Webshop Settings")
 		self.page_length = self.settings.products_per_page or 20
-
 		self.or_filters = []
 		self.filters = [["published", "=", 1]]
+		customer_items = get_b2b_customer_items()
+		if customer_items:
+			self.filters.append(["item_code", "in", customer_items])
 		self.fields = [
 			"web_item_name",
 			"name",
