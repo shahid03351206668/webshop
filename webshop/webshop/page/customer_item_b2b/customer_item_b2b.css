@@ -19,17 +19,18 @@ body {
         }
 
         thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #e3e1e1;
+            color: rgba(0, 0, 0, 0.6);
+            font-weight:500;
         }
 
         thead td {
-            padding: 15px;
             text-align: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            text-transform: uppercase;
+            font-size: 13px;
+            text-transform: capitalize;
             letter-spacing: 0.5px;
+            padding: 8px 0px;
+            font-weight:600;
         }
 
         tbody tr {
@@ -49,12 +50,12 @@ body {
             padding: 12px 15px;
             text-align: center;
             color: #333;
-            font-size:1rem;
+            font-size:13px;
         }
 
         tbody td:first-child {
             font-weight: 600;
-            color: #667eea;
+            color: rgba(0, 0, 0, 0.6);
         }
 
         .checkbox {

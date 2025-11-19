@@ -4,15 +4,17 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 		title: 'Customer Item B2B',
 		single_column: true
 	});
+	
 	wrapper = $(wrapper).find('.layout-main-section');
 	wrapper.append(`
 			<div class="table-container">
 				<table style="width:100%;">
 					<thead>
 						<tr>
-							<td style="text-align:center;"></td>
+							<td style="text-align:center;padding-top:5px;"><input class="checkbox-header" onchange = "on_header_check_change(this)" type="checkbox"></td>
 							<td style="text-align:center;class='item_code'">Item Code</td>
 							<td style="text-align:center;">Item Name</td>
+							<td style="text-align:center;">Web Item No</td>
 							<td style="text-align:center;">Item Group</td>
 							<td style="text-align:center;">Brand</td>
 						</tr>
@@ -22,6 +24,7 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 				</table>  
 			</div>
 		`)
+	
 	$('#table-data').html(`
 		<tr>
 			<td colspan="5" style="text-align:center;">Please select a customer</td>
@@ -29,9 +32,11 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 	`);
 	// Store field references
 	let fields = {};
-	
 	make_field();
-	
+	let params = new URLSearchParams(window.location.search);
+	if (params.get("customer")) {
+		fields.customer.set_value(params.get("customer"))
+	}
 	function get_items(){
 		// Get current values from all fields
 		const customer_val = fields.customer ? fields.customer.get_value() : null;
@@ -43,7 +48,7 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 		if (!customer_val) {
 			$('#table-data').html(`
 				<tr>
-					<td colspan="5" style="text-align:center;">Please select a customer</td>
+					<td colspan="6" style="text-align:center;">Please select a customer</td>
 				</tr>
 			`);
 			return;
@@ -69,6 +74,7 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 								<td style="text-align:center;"><input class="checkbox" type="checkbox" ${checked}></td>
 								<td style="text-align:center;class="item_code">${row.name}</td>
 								<td style="text-align:center;">${row.item_name}</td>
+								<td style="text-align:center">${row.website_item || ""}</td>
 								<td style="text-align:center;">${row.item_group}</td>
 								<td style="text-align:center;">${row.brand || ""}</td>
 							</tr>
@@ -78,7 +84,7 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 				else{
 					table_html += `
 						<tr>
-							<td colspan="5" style="text-align:center;">No Data Found</td>
+							<td colspan="6" style="text-align:center;">No Data Found</td>
 						</tr>
 					`
 				}
@@ -86,6 +92,8 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 			}
 		})
 	}
+
+	
 	
 	function make_field(){
 		fields.customer = page.add_field({
@@ -151,25 +159,58 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 			});
 		}
 		// console.log('Checked Items:', CheckedItems);
-		if (CheckedItems.length > 0){
-			frappe.call({
-				method:"webshop.webshop.page.customer_item_b2b.customer_item_b2b.update_items",
-				args:{
-					customer:fields.customer.get_value(),
-					updated_items:CheckedItems
-				},
-				callback:function(res){
-					let data = res.message;
-					if(data){
-						frappe.msgprint({message:`Customer ${fields.customer.get_value()} Updated Successfully`, indicator:"green"})
-					}
-					else{
-						frappe.msgprint({message:`Error Updating ${fields.customer.get_value()}`, indicator:"red"})
-					}
+		frappe.call({
+			method:"webshop.webshop.page.customer_item_b2b.customer_item_b2b.update_items",
+			args:{
+				customer:fields.customer.get_value(),
+				updated_items:CheckedItems
+			},
+			callback:function(res){
+				let data = res.message;
+				if(data){
+					frappe.msgprint({message:`Customer ${fields.customer.get_value()} Updated Successfully`, indicator:"green"})
 				}
+				else{
+					frappe.msgprint({message:`Error Updating ${fields.customer.get_value()}`, indicator:"red"})
+				}
+			}
 
-			})
-		}
+		})
 	}
 	let save_button = page.set_primary_action('Save', ()=>update_items())
+}
+
+function on_header_check_change(element){
+	console.log(element)
+	const table_data = document.getElementById('table-data');
+	const checkbox_header = document.querySelector('.checkbox-header');
+	if (!table_data) {
+		console.error('table-data not found');
+		return;
+	}
+	
+	if (!checkbox_header) {
+		console.error('checkbox-header not found');
+		return;
+	}
+	if (table_data && checkbox_header.checked){
+		let allrows = table_data.querySelectorAll('tr');
+		allrows.forEach((row, index)=>{
+			const checkbox = row.querySelector('input[type="checkbox"].checkbox');
+			console.log(checkbox.checked)
+			checkbox.checked = true;
+			// if (!checkbox.checked){
+			// }
+		})	
+	}
+	else if(!checkbox_header.checked){
+		let allrows = table_data.querySelectorAll('tr');
+		allrows.forEach((row, index)=>{
+			const checkbox = row.querySelector('input[type="checkbox"].checkbox');
+			console.log(checkbox.checked)
+			checkbox.checked = false;
+			// if (!checkbox.checked){
+			// }
+		})	
+	}
 }
