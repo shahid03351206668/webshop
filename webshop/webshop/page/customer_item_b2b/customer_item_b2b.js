@@ -11,12 +11,12 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 				<table style="width:100%;">
 					<thead>
 						<tr>
-							<td style="text-align:left;margin-top:5px;"><input class="checkbox-header" onchange = "on_header_check_change(this)" type="checkbox"></td>
-							<td style="text-align:left;class='item_code'">Item Code</td>
-							<td style="text-align:left;">Item Name</td>
-							<td style="text-align:left;">Web Item No</td>
-							<td style="text-align:left;">Item Group</td>
-							<td style="text-align:left;">Brand</td>
+							<td style="text-align:left;margin-top:5px;width:5%;"><input class="checkbox-header" onchange = "on_header_check_change(this)" type="checkbox"></td>
+							<td style="text-align:left;width:10%;" class='item_code'>Item Code</td>
+							<td style="text-align:left;width:30%;">Item Name</td>
+							<td style="text-align:left;width:20%;">Web Item No</td>
+							<td style="text-align:left;width:25%;">Item Group</td>
+							<td style="text-align:left;width:10%;">Brand</td>
 						</tr>
 					</thead>
 					<tbody id="table-data">
