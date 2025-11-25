@@ -11,12 +11,12 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 				<table style="width:100%;">
 					<thead>
 						<tr>
-							<td style="text-align:center;padding-top:5px;"><input class="checkbox-header" onchange = "on_header_check_change(this)" type="checkbox"></td>
-							<td style="text-align:center;class='item_code'">Item Code</td>
-							<td style="text-align:center;">Item Name</td>
-							<td style="text-align:center;">Web Item No</td>
-							<td style="text-align:center;">Item Group</td>
-							<td style="text-align:center;">Brand</td>
+							<td style="text-align:left;margin-top:5px;"><input class="checkbox-header" onchange = "on_header_check_change(this)" type="checkbox"></td>
+							<td style="text-align:left;class='item_code'">Item Code</td>
+							<td style="text-align:left;">Item Name</td>
+							<td style="text-align:left;">Web Item No</td>
+							<td style="text-align:left;">Item Group</td>
+							<td style="text-align:left;">Brand</td>
 						</tr>
 					</thead>
 					<tbody id="table-data">
@@ -43,7 +43,8 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 		const item_val = fields.item_code ? fields.item_code.get_value() : null;
 		const item_group_val = fields.item_group ? fields.item_group.get_value() : null;
 		const brand_val = fields.brand ? fields.brand.get_value() : null;
-		
+		let checked_item_val = fields.show_selected_items ? fields.show_selected_items.get_value(): null
+
 		// Customer is required, don't call if empty
 		if (!customer_val) {
 			$('#table-data').html(`
@@ -60,7 +61,8 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 				customer: customer_val,
 				item: item_val,
 				item_group: item_group_val,
-				brand: brand_val
+				brand: brand_val,
+				check: cint(checked_item_val)
 			},
 			callback:function(res){
 				let data = res.message;
@@ -71,12 +73,12 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 						const checked = row['checked'] == 1 ? 'checked' : '';
 						table_html += `
 							<tr>
-								<td style="text-align:center;"><input class="checkbox" type="checkbox" ${checked}></td>
-								<td style="text-align:center;class="item_code">${row.name}</td>
-								<td style="text-align:center;">${row.item_name}</td>
-								<td style="text-align:center">${row.website_item || ""}</td>
-								<td style="text-align:center;">${row.item_group}</td>
-								<td style="text-align:center;">${row.brand || ""}</td>
+								<td style="text-align:left;"><input class="checkbox" type="checkbox" ${checked}></td>
+								<td style="text-align:left;class="item_code">${row.name}</td>
+								<td style="text-align:left;">${row.item_name}</td>
+								<td style="text-align:left;">${row.website_item || ""}</td>
+								<td style="text-align:left;">${row.item_group}</td>
+								<td style="text-align:left;">${row.brand || ""}</td>
 							</tr>
 						`
 					}
@@ -136,6 +138,16 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 				get_items();
 			}
 		});
+		
+		fields.show_selected_items = page.add_field({
+			label: 'Show Selected Items',
+			fieldtype: 'Check',
+			fieldname: 'show_selected_items',
+			change() {
+				get_items();
+			}
+		});
+
 	} 
 	function update_items(){
 		const CheckedItems = [];

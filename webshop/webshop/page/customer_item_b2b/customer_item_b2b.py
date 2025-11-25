@@ -1,10 +1,10 @@
 import frappe
-from frappe.utils import flt, cstr
+from frappe.utils import flt, cstr, cint
 import json
 
 
 @frappe.whitelist()
-def get_items(customer=None, item=None, item_group=None, brand=None):
+def get_items(customer=None, item=None, item_group=None, brand=None, check=None):
 	item_conds = ""
 	if item:
 		item_conds += f""" and name = '{item}'"""
@@ -22,7 +22,7 @@ def get_items(customer=None, item=None, item_group=None, brand=None):
 		WHERE is_sales_item = 1 AND disabled = 0
 		{item_conds}
 	""", as_dict=1)
-	customer_items_query = frappe.db.sql(f"""SELECT item FROM `tabCustomer Items B2B` WHERE parent = '{customer}' """, as_dict=1) or []
+	customer_items_query = frappe.db.sql(f"""SELECT item FROM `tabCustomer Items B2B` WHERE parent = '{customer}'""", as_dict=1) or []
 	customer_items = [r.item for r in customer_items_query]
 	for item in items:
 		item_name = item.get('name')
@@ -32,6 +32,8 @@ def get_items(customer=None, item=None, item_group=None, brand=None):
 		website_item = frappe.db.sql(f"""SELECT name FROM `tabWebsite Item` WHERE item_code = '{item_name}' LIMIT 1""", as_dict=1)
 		if website_item:
 			item['website_item'] = website_item[0].get("name")
+	if cint(check):
+		items = [i for i in items if i.get('checked')]
 	return items
 
 @frappe.whitelist()

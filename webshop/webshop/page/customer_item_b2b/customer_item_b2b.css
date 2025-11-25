@@ -48,7 +48,7 @@ body {
 
         tbody td {
             padding: 12px 15px;
-            text-align: center;
+            text-align: left;
             color: #333;
             font-size:13px;
         }
@@ -87,3 +87,12 @@ body {
             color: #999;
             font-style: italic;
         }
+
+
+.checkbox-header{
+    margin-left:16px;
+}
+
+.label-area{
+    width:8rem;
+}
