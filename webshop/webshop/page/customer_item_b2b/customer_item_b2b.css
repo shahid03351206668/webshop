@@ -96,3 +96,9 @@ body {
 .label-area{
     width:8rem;
 }
+
+.item_code_data:hover, 
+.web_item_data:hover{
+    cursor:pointer;
+    text-decoration: underline;
+}

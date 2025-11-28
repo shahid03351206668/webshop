@@ -75,9 +75,9 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 						table_html += `
 							<tr>
 								<td style="text-align:left;"><input class="checkbox" type="checkbox" ${checked}></td>
-								<td style="text-align:left;" onclick="on_item_click(this)">${row.name}</td>
+								<td class="item_code_data" style="text-align:left;" onclick="on_item_click(this)">${row.name}</td>
 								<td style="text-align:left;">${row.item_name}</td>
-								<td style="text-align:left;" onclick="on_webitem_click(this)">${row.website_item || ""}</td>
+								<td class="web_item_data" style="text-align:left;" onclick="on_webitem_click(this)">${row.website_item || ""}</td>
 								<td style="text-align:left;">${row.item_group}</td>
 								<td style="text-align:left;">${row.brand || ""}</td>
 							</tr>
