@@ -68,15 +68,16 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 				let data = res.message;
 				let table_html = "";
 				if(data && data.length > 0){
-					console.log(data)					
+					// frappe.msgprint(cstr(frappe.get_route()))
+					// console.log(data)					
 					for(let row of data){
 						const checked = row['checked'] == 1 ? 'checked' : '';
 						table_html += `
 							<tr>
 								<td style="text-align:left;"><input class="checkbox" type="checkbox" ${checked}></td>
-								<td style="text-align:left;class="item_code">${row.name}</td>
+								<td style="text-align:left;" onclick="on_item_click(this)">${row.name}</td>
 								<td style="text-align:left;">${row.item_name}</td>
-								<td style="text-align:left;">${row.website_item || ""}</td>
+								<td style="text-align:left;" onclick="on_webitem_click(this)">${row.website_item || ""}</td>
 								<td style="text-align:left;">${row.item_group}</td>
 								<td style="text-align:left;">${row.brand || ""}</td>
 							</tr>
@@ -193,7 +194,7 @@ frappe.pages['customer-item-b2b'].on_page_load = function(wrapper) {
 }
 
 function on_header_check_change(element){
-	console.log(element)
+	// console.log(element)
 	const table_data = document.getElementById('table-data');
 	const checkbox_header = document.querySelector('.checkbox-header');
 	if (!table_data) {
@@ -209,7 +210,7 @@ function on_header_check_change(element){
 		let allrows = table_data.querySelectorAll('tr');
 		allrows.forEach((row, index)=>{
 			const checkbox = row.querySelector('input[type="checkbox"].checkbox');
-			console.log(checkbox.checked)
+			// console.log(checkbox.checked)
 			checkbox.checked = true;
 			// if (!checkbox.checked){
 			// }
@@ -219,10 +220,32 @@ function on_header_check_change(element){
 		let allrows = table_data.querySelectorAll('tr');
 		allrows.forEach((row, index)=>{
 			const checkbox = row.querySelector('input[type="checkbox"].checkbox');
-			console.log(checkbox.checked)
+			// console.log(checkbox.checked)
 			checkbox.checked = false;
 			// if (!checkbox.checked){
 			// }
 		})	
 	}
+}
+
+function set_item_route(item, webitem){
+	if (item){
+		frappe.set_route(['Form', 'Item', cstr(item)]);
+	}
+	else if(webitem){
+		frappe.set_route(['Form', 'Website Item', cstr(webitem)]);
+	}
+}
+
+function on_item_click(item){
+	console.warn(item);
+	let item_code = item.textContent;
+	// console.log(item_code)
+	set_item_route(item_code, undefined)
+}
+function on_webitem_click(item){
+	console.warn(item);
+	let item_code = item.textContent
+	// console.log(item_code)
+	set_item_route(undefined, item_code)
 }
