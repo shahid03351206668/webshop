@@ -51,7 +51,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
         
         if not is_guest or not cart_settings.hide_price_for_guest:
             if party:
-                default_price_list = frappe.db.sql(f"""SELECT default_price_list FROM `tabCustomer` WHERE name = '{frappe.db.escape(party.name)}'""", as_dict=1)
+                default_price_list = frappe.db.sql(f"""SELECT default_price_list FROM `tabCustomer` WHERE name = {frappe.db.escape(party.name)}""", as_dict=1)
                 if default_price_list:
                     selling_price_list = default_price_list[0].get("default_price_list")
             item_price = frappe.db.sql(
@@ -63,7 +63,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
 				FROM `tabItem Price` ip
 				INNER JOIN `tabCurrency` c 
 					ON c.name = ip.currency
-				WHERE ip.item_code = {frappe.db.escape(item_code)} 
+				WHERE ip.item_code = {frappe.db.escape(item_code)}
 				AND ip.price_list = {frappe.db.escape(selling_price_list)}  
 				AND (ip.valid_from IS NULL OR ip.valid_from <= {frappe.db.escape(today)})
 				AND (ip.valid_upto IS NULL OR ip.valid_upto >= {frappe.db.escape(today)})
