@@ -50,10 +50,6 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
         today = nowdate()
         
         if not is_guest or not cart_settings.hide_price_for_guest:
-            if party:
-                default_price_list = frappe.db.sql(f"""SELECT default_price_list FROM `tabCustomer` WHERE name = {frappe.db.escape(party.name)}""", as_dict=1)
-                if default_price_list:
-                    selling_price_list = default_price_list[0].get("default_price_list")
             item_price = frappe.db.sql(
                 f"""
 				SELECT
@@ -88,7 +84,10 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
                 }
 
             else:
-
+                if party:
+                    default_price_list = frappe.db.sql(f"""SELECT default_price_list FROM `tabCustomer` WHERE name = {frappe.db.escape(party.name)}""", as_dict=1)
+                    if default_price_list:
+                        selling_price_list = default_price_list[0].get("default_price_list")
                 price = get_price(
                     item_code,
                     selling_price_list,
