@@ -38,18 +38,22 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
     #     else _set_price_list(cart_settings, None)
     # )
 
+
     selling_price_list = cart_settings.get("price_list")
 
     price = {}
     if cart_settings.show_price:
         is_guest = frappe.session.user == "Guest"
         party = get_party()
-
         # Show Price if logged in.
         # If not logged in, check if price is hidden for guest.
         today = nowdate()
         
         if not is_guest or not cart_settings.hide_price_for_guest:
+            if party:
+                default_price_list = frappe.db.sql(f"""SELECT default_price_list FROM `tabCustomer` WHERE name = '{frappe.db.escape(party.name)}'""", as_dict=1)
+                if default_price_list:
+                    selling_price_list = default_price_list.get("default_price_list")
             item_price = frappe.db.sql(
                 f"""
 				SELECT
