@@ -345,8 +345,6 @@ class WebsiteItem(WebsiteGenerator):
 		context.shopping_cart = get_product_info_for_website(
 			self.item_code, skip_quotation_creation=True
 		)
-		frappe.throw(cstr(context.shopping_cart))
-
 	@frappe.whitelist()
 	def copy_specification_from_item_group(self):
 		self.set("website_specifications", [])
