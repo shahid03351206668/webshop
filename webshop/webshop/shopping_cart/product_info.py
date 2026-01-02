@@ -84,6 +84,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
                 }
 
             else:
+                frappe.throw(str(party))
                 if party:
                     default_price_list = frappe.db.sql(f"""SELECT default_price_list FROM `tabCustomer` WHERE name = {frappe.db.escape(party.name)}""", as_dict=1)
                     if default_price_list:
