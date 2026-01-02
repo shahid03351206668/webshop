@@ -140,8 +140,6 @@ def set_product_info_for_website(item):
     product_info = get_product_info_for_website(item.item_code, skip_quotation_creation=True).get(
         "product_info"
     )
-    frappe.throw(str(product_info))
-
     if product_info:
         item.update(product_info)
         item["stock_uom"] = product_info.get("uom")

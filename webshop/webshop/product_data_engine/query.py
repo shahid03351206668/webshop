@@ -236,7 +236,7 @@ class ProductQuery:
 			product_info = get_product_info_for_website(item.item_code, skip_quotation_creation=True).get(
 				"product_info"
 			)
-
+			frappe.throw(str(product_info))
 			if product_info and product_info["price"]:
 				# update/mutate item and discount_list objects
 				self.get_price_discount_info(item, product_info["price"], discount_list)
