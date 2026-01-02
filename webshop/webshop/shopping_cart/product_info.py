@@ -68,7 +68,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
                 as_dict=True,
                 debug=True,
             )
-            frappe.throw(str(item_price))
+            # frappe.throw(str(item_price))
             if item_price:
                 item_price = item_price[0]
                 price = {
