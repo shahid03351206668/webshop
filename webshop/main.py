@@ -2,7 +2,7 @@ import frappe
 
 def validate_portal_user(self):
     for user in self.portal_users:
-        exists = frappe.db.exists("Portal User", {"user": user, "parent":["!=", self.name]}) or False
+        exists = frappe.db.exists("Portal User", {"user": user.get("user"), "parent":["!=", self.name]}) or False
         if exists:
             frappe.throw("This User is Already Linked with Another Master")
 
