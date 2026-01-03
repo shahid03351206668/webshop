@@ -72,9 +72,9 @@ doc_events = {
         ],
     },
     "Customer":{
-        "validate":"webshop.webshop.main.customer_validate",
-        "before_save":"webshop.webshop.main.customer_before_save",
-        "before_insert": "webshop.webshop.main.customer_before_insert"
+        "validate":"webshop.main.customer_validate",
+        "before_save":"webshop.main.customer_before_save",
+        "before_insert": "webshop.main.customer_before_insert"
     }
 }
 
