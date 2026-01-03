@@ -34,12 +34,12 @@ def set_cart_count(quotation=None):
 @frappe.whitelist()
 def get_cart_quotation(doc=None):
     party = get_party()
-    
+
     if not doc:
         quotation = _get_cart_quotation(party)
         doc = quotation
         set_cart_count(quotation)
-    
+
     addresses = get_address_docs(party=party)
 
     if not doc.customer_address and addresses:
@@ -376,7 +376,7 @@ def _get_cart_quotation(party=None):
     """Return the open Quotation of type "Shopping Cart" or make a new one"""
     if not party:
         party = get_party()
-        
+
     frappe.log_error(f"party name {frappe.session.user}", party.name)
 
     quotation = frappe.db.get_all(
@@ -387,13 +387,12 @@ def _get_cart_quotation(party=None):
             "order_type": "Shopping Cart",
             "docstatus": 0,
         },
-
         order_by="modified desc",
         limit_page_length=1,
     )
-    
+
     frappe.log_error("quotation", str(quotation))
-    
+
     if quotation:
         qdoc = frappe.get_doc("Quotation", quotation[0].name)
     else:
@@ -547,10 +546,8 @@ def set_taxes(quotation, cart_settings):
 def get_party(user=None):
     if not user:
         user = frappe.session.user
-
     contact_name = get_contact_name(user)
     party = None
-
     if contact_name:
         contact = frappe.get_doc("Contact", contact_name)
         if contact.links:
@@ -558,13 +555,18 @@ def get_party(user=None):
             party = contact.links[0].link_name
 
     cart_settings = frappe.get_cached_doc("Webshop Settings")
-
     debtors_account = ""
-
     if cart_settings.enable_checkout:
         debtors_account = get_debtors_account(cart_settings)
-
-    if party:
+    if frappe.db.exists("Portal User", {"user": user}):
+        party_data = (
+            frappe.db.get_value(
+                "Portal User", {"user": user}, ["parent", "parent_type"], as_dict=1
+            )
+            or frappe._dict()
+        )
+        return frappe.get_doc(party_data.parent_type, party_data.parent)
+    elif party:
         doc = frappe.get_doc(party_doctype, party)
         if doc.doctype in ["Customer", "Supplier"]:
             if not frappe.db.exists("Portal User", {"parent": doc.name, "user": user}):
@@ -572,7 +574,6 @@ def get_party(user=None):
                 doc.flags.ignore_permissions = True
                 doc.flags.ignore_mandatory = True
                 doc.save()
-
         return doc
 
     elif not frappe.db.exists("Portal User", {"user": user}):
