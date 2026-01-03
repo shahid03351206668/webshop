@@ -561,11 +561,11 @@ def get_party(user=None):
     if frappe.db.exists("Portal User", {"user": user}):
         party_data = (
             frappe.db.get_value(
-                "Portal User", {"user": user}, ["parent", "parent_type"], as_dict=1
+                "Portal User", {"user": user}, ["parent", "parenttype"], as_dict=1
             )
             or frappe._dict()
         )
-        return frappe.get_doc(party_data.parent_type, party_data.parent)
+        return frappe.get_doc(party_data.parenttype, party_data.parent)
     elif party:
         doc = frappe.get_doc(party_doctype, party)
         if doc.doctype in ["Customer", "Supplier"]:
