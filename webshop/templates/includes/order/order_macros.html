@@ -36,15 +36,13 @@
 		   {{ d.item_name|truncate(25) }}
 			<div class="input-group number-spinner">
 				<span class="input-group-btn">
-					<button class="btn btn-light cart-btn" data-dir="dwn">
-						–</button>
+					<button class="btn btn-light cart-btn" data-dir="dwn"> - </button>
 				</span>
 				<input class="form-control text-right cart-qty"
 					value = "{{ d.get_formatted('qty') }}"
 					data-item-code="{{ d.item_code }}">
 				<span class="input-group-btn">
-					<button class="btn btn-light cart-btn" data-dir="up">
-						+</button>
+					<button class="btn btn-light cart-btn" data-dir="up"> + </button>
 				</span>
 			</div>
 		</div>

@@ -40,7 +40,7 @@
 		<div class="mt-2">
 			{% if product_info.get("on_backorder") %}
 				<span class="no-stock out-of-stock" style="color: var(--primary-color);">
-					{{ _('Available on backorder') }}
+					{{ _('keine Lagerführung - Produktionsartikel') }}
 				</span>
 			{% elif product_info.in_stock == 0 %}
 				<span class="no-stock out-of-stock">

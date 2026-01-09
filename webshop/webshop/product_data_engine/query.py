@@ -39,12 +39,15 @@ class ProductQuery:
 		self.fields = [
 			"web_item_name",
 			"name",
+			"stock_uom",
+			"brand",
 			"item_name",
 			"item_code",
 			"website_image",
 			"variant_of",
 			"has_variants",
 			"item_group",
+			"custom_website_category",
 			"web_long_description",
 			"short_description",
 			"route",
@@ -53,7 +56,7 @@ class ProductQuery:
 			"on_backorder",
 		]
 
-	def query(self, attributes=None, fields=None, search_term=None, start=0, item_group=None):
+	def query(self, attributes=None, fields=None, search_term=None, start=0, item_group=None, website_category=None):
 		"""
 		Args:
 		        attributes (dict, optional): Item Attribute filters
@@ -76,6 +79,8 @@ class ProductQuery:
 			self.build_search_filters(search_term)
 		if self.settings.hide_variants:
 			self.filters.append(["variant_of", "is", "not set"])
+		if website_category:
+			self.filters.append(["custom_website_category", "=", website_category])
 
 		# query results
 		if attributes:
@@ -243,9 +248,13 @@ class ProductQuery:
 
 			if self.settings.show_stock_availability:
 				self.get_stock_availability(item)
-
-			item.in_cart = item.item_code in cart_items
-
+			item.in_cart = False
+			item.cart_qty = 0
+			for item_code, qty in cart_items:
+				if item_code == item.item_code:
+					item.in_cart = True
+					item.cart_qty = qty
+					break
 			item.wished = False
 			if frappe.db.exists(
 				"Wishlist Item", {"item_code": item.item_code, "parent": frappe.session.user}
@@ -309,9 +318,9 @@ class ProductQuery:
 			)
 			if quotation:
 				items = frappe.get_all(
-					"Quotation Item", fields=["item_code"], filters={"parent": quotation[0].get("name")}
+					"Quotation Item", fields=["item_code", "qty"], filters={"parent": quotation[0].get("name")}
 				)
-				items = [row.item_code for row in items]
+				items = [[row.item_code, row.qty] for row in items]
 				return items
 
 		return []

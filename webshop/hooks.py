@@ -24,7 +24,7 @@ update_website_context = [
     "webshop.webshop.shopping_cart.utils.update_website_context",
 ]
 
-website_generators = ["Website Item", "Item Group"]
+website_generators = ["Website Item", "Item Group", "Website Category"]
 
 override_doctype_class = {
     "Payment Request": "webshop.webshop.doctype.override_doctype.payment_request.PaymentRequest",

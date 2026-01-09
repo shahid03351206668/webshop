@@ -77,7 +77,7 @@ webshop.ProductGrid = class {
 		}
 
 		body_html += `</div>`;
-		body_html += `<div class="product-category" itemprop="name">${ item.item_group || '' }</div>`;
+		body_html += `<div class="product-category" itemprop="name">${ item.item_code } | ${ item.brand } | ${ item.stock_uom }</div>`;
 
 		if (item.formatted_price) {
 			body_html += this.get_price_html(item);
@@ -146,7 +146,7 @@ webshop.ProductGrid = class {
 			if (item.on_backorder) {
 				return `
 					<span class="out-of-stock mb-2 mt-1" style="color: var(--primary-color)">
-						${ __("Available on backorder") }
+						${ __("keine Lagerführung - Produktionsartikel") }
 					</span>
 				`;
 			} else if (!item.in_stock) {

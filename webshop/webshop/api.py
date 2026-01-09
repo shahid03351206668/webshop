@@ -39,9 +39,10 @@ def get_product_filter_data(query_args=None):
 		attribute_filters = query_args.get("attribute_filters", {})
 		start = cint(query_args.start) if query_args.get("start") else 0
 		item_group = query_args.get("item_group")
+		website_category = query_args.get("website_category")
 		from_filters = query_args.get("from_filters")
 	else:
-		search, attribute_filters, item_group, from_filters = None, None, None, None
+		search, attribute_filters, website_category, item_group, from_filters = None, None, None, None, None
 		field_filters = {}
 		start = 0
 
@@ -62,6 +63,7 @@ def get_product_filter_data(query_args=None):
 			search_term=search,
 			start=start,
 			item_group=item_group,
+			website_category=website_category,
 		)
 	except Exception:
 		frappe.log_error("Product query with filter failed")

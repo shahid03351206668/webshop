@@ -136,11 +136,12 @@ webshop.ProductView =  class {
 
 		field_filters = field_filters ? JSON.parse(field_filters) : {};
 		attribute_filters = attribute_filters ? JSON.parse(attribute_filters) : {};
-
+		console.log(this.website_category)
 		return {
 			field_filters: field_filters,
 			attribute_filters: attribute_filters,
 			item_group: this.item_group,
+			website_category: this.website_category,
 			start: filters.start || null,
 			from_filters: this.from_filters || false
 		};

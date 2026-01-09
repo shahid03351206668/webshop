@@ -6,52 +6,88 @@ from frappe.utils import floor
 
 
 class ProductFiltersBuilder:
-	def __init__(self, item_group=None):
-		if not item_group:
+	def __init__(self, item_group=None, website_category=None):
+		if not item_group and not website_category:
 			self.doc = frappe.get_doc("Webshop Settings")
-		else:
+		elif item_group:
 			self.doc = frappe.get_doc("Item Group", item_group)
-
+		elif website_category:
+			self.doc = frappe.get_doc("Website Category", website_category)
 		self.item_group = item_group
+		self.website_category = website_category
 
 	def get_field_filters(self):
-		from webshop.webshop.doctype.override_doctype.item_group import get_child_groups_for_website
+		from webshop.webshop.doctype.override_doctype.item_group import (
+			get_child_groups_for_website,
+		)
 
-		if not self.item_group and not self.doc.enable_field_filters:
+		if (
+			(not self.item_group)
+			and (not self.website_category)
+			and (not self.doc.enable_field_filters)
+		):
 			return
 
 		fields, filter_data = [], []
-		filter_fields = [row.fieldname for row in self.doc.filter_fields]  # fields in settings
+		filter_fields = [
+			row.fieldname for row in self.doc.get("filter_fields") or []
+		]  # fields in settings
 
 		# filter valid field filters i.e. those that exist in Website Item
+		if not filter_fields:
+			if self.item_group:
+				filter_fields = ["item_group"]
+			if self.website_category:
+				filter_fields = ["custom_website_category"]
 		web_item_meta = frappe.get_meta("Website Item", cached=True)
 		fields = [
-			web_item_meta.get_field(field) for field in filter_fields if web_item_meta.has_field(field)
+			web_item_meta.get_field(field)
+			for field in filter_fields
+			if web_item_meta.has_field(field)
 		]
-
 		for df in fields:
 			item_filters, item_or_filters = {"published": 1}, []
 			link_doctype_values = self.get_filtered_link_doctype_records(df)
 
 			if df.fieldtype == "Link":
 				if self.item_group:
-					include_child = frappe.db.get_value("Item Group", self.item_group, "include_descendants")
+					include_child = frappe.db.get_value(
+						"Item Group", self.item_group, "include_descendants"
+					)
 					if include_child:
-						include_groups = get_child_groups_for_website(self.item_group, include_self=True)
+						include_groups = get_child_groups_for_website(
+							self.item_group, include_self=True
+						)
 						include_groups = [x.name for x in include_groups]
 						item_or_filters.extend(
 							[
 								["item_group", "in", include_groups],
-								["Website Item Group", "item_group", "=", self.item_group],  # consider website item groups
+								[
+									"Website Item Group",
+									"item_group",
+									"=",
+									self.item_group,
+								],  # consider website item groups
 							]
 						)
 					else:
 						item_or_filters.extend(
 							[
 								["item_group", "=", self.item_group],
-								["Website Item Group", "item_group", "=", self.item_group],  # consider website item groups
+								[
+									"Website Item Group",
+									"item_group",
+									"=",
+									self.item_group,
+								],  # consider website item groups
 							]
 						)
+				if self.website_category:
+					item_or_filters.extend(
+						[
+							["custom_website_category", "=", self.website_category]
+						]
+					)
 
 				# exclude variants if mentioned in settings
 				if frappe.db.get_single_value("Webshop Settings", "hide_variants"):
@@ -67,7 +103,9 @@ class ProductFiltersBuilder:
 					pluck=df.fieldname,
 				)
 
-				values = list(set(item_values) & link_doctype_values)  # intersection of both
+				values = list(
+					set(item_values) & link_doctype_values
+				)  # intersection of both
 			else:
 				# table multiselect
 				values = list(link_doctype_values)
@@ -75,10 +113,8 @@ class ProductFiltersBuilder:
 			# Remove None
 			if None in values:
 				values.remove(None)
-
 			if values:
 				filter_data.append([df, values])
-
 		return filter_data
 
 	def get_filtered_link_doctype_records(self, field):
@@ -86,13 +122,15 @@ class ProductFiltersBuilder:
 		Get valid link doctype records depending on filters.
 		Apply enable/disable/show_in_website filter.
 		Returns:
-		        set: A set containing valid record names
+				set: A set containing valid record names
 		"""
 		link_doctype = field.get_link_doctype()
 		meta = frappe.get_meta(link_doctype, cached=True) if link_doctype else None
 		if meta:
 			filters = self.get_link_doctype_filters(meta)
-			link_doctype_values = set(d.name for d in frappe.get_all(link_doctype, filters))
+			link_doctype_values = set(
+				d.name for d in frappe.get_all(link_doctype, filters)
+			)
 
 		return link_doctype_values if meta else set()
 
@@ -112,10 +150,14 @@ class ProductFiltersBuilder:
 		return filters
 
 	def get_attribute_filters(self):
-		if not self.item_group and not self.doc.enable_attribute_filters:
+		if (
+			not self.item_group
+			and not self.website_category
+			and not self.doc.enable_attribute_filters
+		):
 			return
 
-		attributes = [row.attribute for row in self.doc.filter_attributes]
+		attributes = [row.attribute for row in self.doc.get("filter_attributes") or []]
 
 		if not attributes:
 			return []
@@ -147,7 +189,10 @@ class ProductFiltersBuilder:
 		# [25.89, 60.5] min max
 		min_discount, max_discount = discounts[0], discounts[1]
 		# [25, 60] rounded min max
-		min_range_absolute, max_range_absolute = floor(min_discount), floor(max_discount)
+		min_range_absolute, max_range_absolute = (
+			floor(min_discount),
+			floor(max_discount),
+		)
 
 		min_range = int(min_discount - (min_range_absolute % 10))  # 20
 		max_range = int(max_discount - (max_range_absolute % 10))  # 60
@@ -155,7 +200,9 @@ class ProductFiltersBuilder:
 		min_range = (
 			(min_range + 10) if min_range != min_range_absolute else min_range
 		)  # 30 (upper limit of 25.89 in range of 10)
-		max_range = (max_range + 10) if max_range != max_range_absolute else max_range  # 60
+		max_range = (
+			(max_range + 10) if max_range != max_range_absolute else max_range
+		)  # 60
 
 		for discount in range(min_range, (max_range + 1), 10):
 			label = _("{0}% and below").format(discount)
