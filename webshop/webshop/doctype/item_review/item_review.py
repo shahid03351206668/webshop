@@ -132,15 +132,15 @@ def get_customer(silent=False):
 	silent: Return customer if exists else return nothing. Dont throw error.
 	"""
 	user = frappe.session.user
-	contact_name = get_contact_name(user)
-	customer = None
-
-	if contact_name:
-		contact = frappe.get_doc("Contact", contact_name)
-		for link in contact.links:
-			if link.link_doctype == "Customer":
-				customer = link.link_name
-				break
+	customer = frappe.db.get_value('Portal User', {"user": user}, "parent")
+	if not customer:
+		contact_name = get_contact_name(user)
+		if contact_name:
+			contact = frappe.get_doc("Contact", contact_name)
+			for link in contact.links:
+				if link.link_doctype == "Customer":
+					customer = link.link_name
+					break
 
 	if customer:
 		return frappe.db.get_value("Customer", customer)
