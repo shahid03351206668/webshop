@@ -86,7 +86,8 @@ webshop.ProductList = class {
 		`;
 
 		if (settings.enabled) {
-			title_html += `<div class="col-4 cart-action-container ${item.in_cart ? 'd-flex' : ''}">`;
+			// title_html += `<div class="col-4 cart-action-container ${item.in_cart ? 'd-flex' : ''}">`;
+			title_html += `<div class="col-4 cart-action-container">`;
 			title_html += this.get_primary_button(item, settings);
 			title_html += `</div>`;
 		}
@@ -190,9 +191,21 @@ webshop.ProductList = class {
 			// <div class="cart-indicator list-indicator ${item.in_cart ? '' : 'hidden'}">
 			// 	1
 			// </div>
+			res_html += `<a href="/cart">
+					<div id="${item.name}" class="btn
+						btn-sm btn-primary 
+						go-to-cart mb-0 mt-0
+						${item.in_cart ? '' : 'hidden'}"
+						data-item-code="${item.item_code}"
+						style="padding: 0.25rem 1rem; min-width: 135px;">
+						${settings.enable_checkout ? __("Go to Cart") : __("Go to Quote")}
+					</div>
+				</a>
+			`;
+
 			if (item.in_cart) {
-				res_html += `
-					<div class="input-group number-spinner">
+				res_html += `<br><br><br>
+					<div class="input-group number-spinner" style="width: 100px; margin: auto;">
 					<span class="input-group-btn">
 						<button class="btn btn-light cart-btn" data-dir="dwn">
 							–</button>
@@ -206,17 +219,7 @@ webshop.ProductList = class {
 					</span>
 				</div>`}
 
-			res_html += `<a href="/cart">
-					<div id="${item.name}" class="btn
-						btn-sm btn-primary btn-add-to-cart-list
-						go-to-cart mb-0 mt-0
-						${item.in_cart ? '' : 'hidden'}"
-						data-item-code="${item.item_code}"
-						style="padding: 0.25rem 1rem; min-width: 135px;">
-						${settings.enable_checkout ? __("Go to Cart") : __("Go to Quote")}
-					</div>
-				</a>
-			`;
+
 			return res_html;
 		} else {
 			return ``;

@@ -139,7 +139,6 @@ $.extend(shopping_cart, {
 
 		if (cart_count) {
 			$badge.html(cart_count);
-
 			if (animate) {
 				$cart.addClass("cart-animate");
 				setTimeout(() => {
@@ -164,10 +163,9 @@ $.extend(shopping_cart, {
 					$(".cart-tax-items").html(r.message.total);
 					$(".payment-summary").html(r.message.taxes_and_totals);
 					shopping_cart.set_cart_count();
-
-					if (cart_dropdown != true) {
-						$(".cart-icon").hide();
-					}
+					// if (cart_dropdown != true) {
+					// 	$(".cart-icon").hide();
+					// }
 				}
 			},
 		});
@@ -203,13 +201,27 @@ $.extend(shopping_cart, {
 				return;
 			}
 
+			const item_code = $btn.data('item-code');
 			$btn.addClass('hidden');
-			$btn.closest('.cart-action-container').addClass('d-flex');
+			// $btn.closest('.cart-action-container').addClass('d-flex');
+			$btn.closest('.cart-action-container').append(`<br><br><br>
+				<div class="input-group number-spinner" style="width: 100px; margin: auto;">
+				<span class="input-group-btn">
+					<button class="btn btn-light cart-btn" data-dir="dwn">
+						–</button>
+				</span>
+				<input class="form-control text-right cart-qty"
+					value = "${1}"
+					data-item-code="${item_code}">
+				<span class="input-group-btn">
+					<button class="btn btn-light cart-btn" data-dir="up">
+						+</button>
+				</span>
+			</div>`);
 			$btn.parent().find('.go-to-cart').removeClass('hidden');
 			$btn.parent().find('.go-to-cart-grid').removeClass('hidden');
 			$btn.parent().find('.cart-indicator').removeClass('hidden');
 
-			const item_code = $btn.data('item-code');
 			webshop.webshop.shopping_cart.update_cart({
 				item_code,
 				qty: 1
@@ -243,7 +255,7 @@ $.extend(shopping_cart, {
 	},
 
 	freeze() {
-		if (window.location.pathname !== "/cart") return;
+		// if (window.location.pathname !== "/cart") return;
 
 		if (!$('#freeze').length) {
 			let freeze = $('<div id="freeze" class="modal-backdrop fade"></div>')
