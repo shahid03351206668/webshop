@@ -2,7 +2,7 @@
 # License: GNU General Public License v3. See license.txt
 
 import frappe
-from frappe.utils import nowdate, fmt_money, flt
+from frappe.utils import nowdate, fmt_money, flt, cint  
 
 from webshop.webshop.doctype.webshop_settings.webshop_settings import (
     get_shopping_cart_settings,
@@ -28,9 +28,9 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
         # return settings even if cart is disabled
         return frappe._dict({"product_info": {}, "cart_settings": cart_settings})
 
-    cart_quotation = frappe._dict()
-    if not skip_quotation_creation:
-        cart_quotation = _get_cart_quotation()
+    # cart_quotation = frappe._dict()
+    # if not skip_quotation_creation:
+    cart_quotation = _get_cart_quotation()
 
     # selling_price_list = (
     #     cart_quotation.get("selling_price_list")
@@ -119,7 +119,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
         if stock_status.on_backorder:
             product_info["on_backorder"] = True
         else:
-            product_info["stock_qty"] = stock_status.stock_qty
+            product_info["stock_qty"] = cint(stock_status.stock_qty)
             product_info["in_stock"] = (
                 stock_status.in_stock
                 if stock_status.is_stock_item
@@ -131,7 +131,7 @@ def get_product_info_for_website(item_code, skip_quotation_creation=False):
         if frappe.session.user != "Guest":
             item = cart_quotation.get({"item_code": item_code}) if cart_quotation else None
             if item:
-                product_info["qty"] = item[0].qty
+                product_info["qty"] = cint(item[0].qty)
 
     return frappe._dict({"product_info": product_info, "cart_settings": cart_settings})
 

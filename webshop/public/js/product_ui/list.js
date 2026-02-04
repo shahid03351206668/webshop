@@ -207,19 +207,18 @@ webshop.ProductList = class {
 				res_html += `<br><br><br>
 					<div class="input-group number-spinner" style="width: 100px; margin: auto;">
 					<span class="input-group-btn">
-						<button class="btn btn-light cart-btn" data-dir="dwn">
+						<button class="btn btn-light cart-btn" data-dir="dwn"  style="border-bottom-right-radius: 0px; border-top-right-radius: 0px;">
 							–</button>
 					</span>
-					<input class="form-control text-right cart-qty"
+					<input class="form-control text-right cart-qty disabled"
+						disabled="disabled"
 						value = "${item.cart_qty}"
 						data-item-code="${item.item_code}">
 					<span class="input-group-btn">
-						<button class="btn btn-light cart-btn" data-dir="up">
+						<button class="btn btn-light cart-btn" data-dir="up"  style="border-bottom-left-radius: 0px; border-top-left-radius: 0px;">
 							+</button>
 					</span>
 				</div>`}
-
-
 			return res_html;
 		} else {
 			return ``;

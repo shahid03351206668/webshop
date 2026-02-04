@@ -14,6 +14,7 @@ def execute(doc, method=None):
             "brand",
             "description",
             "disabled",
+            "custom_website_category",
         ]
         doc_before_save = doc.get_doc_before_save()
 
@@ -29,4 +30,5 @@ def execute(doc, method=None):
 
                 web_item_doc = frappe.get_doc("Website Item", web_item)
                 web_item_doc.update(changed)
+                web_item_doc.flags.ignore_mandatory=True
                 web_item_doc.save()
