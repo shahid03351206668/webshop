@@ -87,7 +87,7 @@ webshop.ProductList = class {
 
 		if (settings.enabled) {
 			// title_html += `<div class="col-4 cart-action-container ${item.in_cart ? 'd-flex' : ''}">`;
-			title_html += `<div class="col-4 cart-action-container">`;
+			title_html += `<div class="col-4 cart-action-container d-flex">`;
 			title_html += this.get_primary_button(item, settings);
 			title_html += `</div>`;
 		}
@@ -98,7 +98,7 @@ webshop.ProductList = class {
 
 	get_item_details(item, settings) {
 		let details = `
-			<p class="product-code">
+			<p class="product-code" style="margin-top:-5px;">
 				${item.item_code} | ${item.brand} | ${item.stock_uom}
 			</p>
 			<div class="mt-2" style="color: var(--gray-600) !important; font-size: 13px;">
@@ -139,11 +139,11 @@ webshop.ProductList = class {
 					<br>
 					<span class="out-of-stock mt-2">${__("Out of stock")}</span>
 				`;
-			} else if (item.is_stock) {
+			} else if (item.in_stock) {
 				return `
 					<br>
 					<span class="in-stock in-green has-stock mt-2"
-						style="font-size: 14px;">${__("In stock")}</span>
+						style="font-size: 14px;">${__("In stock")} (${item.in_stock})</span>
 				`;
 			}
 		}
@@ -191,6 +191,20 @@ webshop.ProductList = class {
 			// <div class="cart-indicator list-indicator ${item.in_cart ? '' : 'hidden'}">
 			// 	1
 			// </div>
+			res_html += `<div class="input-group number-spinner ${item.in_cart ? '' : 'hidden'}" style="width: 100px; margin: auto;">
+				<span class="input-group-btn">
+					<button class="btn btn-light cart-btn" data-dir="dwn"  style="border-bottom-right-radius: 0px; border-top-right-radius: 0px;">
+						–</button>
+				</span>
+				<input class="form-control text-right cart-qty disabled"
+					disabled="disabled"
+					value = "${item.cart_qty || 1}"
+					data-item-code="${item.item_code}">
+				<span class="input-group-btn">
+					<button class="btn btn-light cart-btn" data-dir="up"  style="border-bottom-left-radius: 0px; border-top-left-radius: 0px;">
+						+</button>
+				</span>
+			</div>`
 			res_html += `<a href="/cart">
 					<div id="${item.name}" class="btn
 						btn-sm btn-primary 
@@ -202,23 +216,6 @@ webshop.ProductList = class {
 					</div>
 				</a>
 			`;
-
-			if (item.in_cart) {
-				res_html += `<br><br><br>
-					<div class="input-group number-spinner" style="width: 100px; margin: auto;">
-					<span class="input-group-btn">
-						<button class="btn btn-light cart-btn" data-dir="dwn"  style="border-bottom-right-radius: 0px; border-top-right-radius: 0px;">
-							–</button>
-					</span>
-					<input class="form-control text-right cart-qty disabled"
-						disabled="disabled"
-						value = "${item.cart_qty}"
-						data-item-code="${item.item_code}">
-					<span class="input-group-btn">
-						<button class="btn btn-light cart-btn" data-dir="up"  style="border-bottom-left-radius: 0px; border-top-left-radius: 0px;">
-							+</button>
-					</span>
-				</div>`}
 			return res_html;
 		} else {
 			return ``;

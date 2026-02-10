@@ -299,7 +299,7 @@ class ProductQuery:
 				item.in_stock = True
 		elif warehouse:
 			# stock item and has warehouse
-			item.in_stock = get_stock_availability_from_template(item.item_code, warehouse)
+			item.in_stock = get_stock(item.item_code, warehouse)
 
 	def get_cart_items(self):
 		customer = get_customer(silent=True)
@@ -340,3 +340,20 @@ class ProductQuery:
 			result[: self.page_length]
 
 		return result
+
+
+def get_stock(item_code, warehouse):
+	from erpnext.stock.doctype.warehouse.warehouse import get_child_warehouses
+
+	if warehouse and frappe.get_cached_value("Warehouse", warehouse, "is_group") == 1:
+		warehouses = get_child_warehouses(warehouse)
+	else:
+		warehouses = [warehouse] if warehouse else []
+
+	stock_qty = 0.0
+	for warehouse in warehouses:
+		stock_qty += frappe.utils.flt(
+			frappe.db.get_value("Bin", {"item_code": item_code, "warehouse": warehouse}, "actual_qty")
+		)
+
+	return stock_qty
